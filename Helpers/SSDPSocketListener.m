@@ -72,14 +72,15 @@
 
 - (void)raiseError
 {
-	_error = [ConnectError generateErrorWithCode:ConnectStatusCodeSocketError andDetails:@"Detection socket disconnected"];
-	dispatch_async(self.delegateQueue,
-		^{
-			if ([self.delegate respondsToSelector:@selector(socket:didEncounterError:)])
-			{
-				[self.delegate socket:self didEncounterError:_error];
-			}
-		});
+    _error = [ConnectError generateErrorWithCode:ConnectStatusCodeSocketError andDetails:@"Detection socket disconnected"];
+    dispatch_queue_t queue = self.delegateQueue ?: dispatch_get_main_queue();
+    dispatch_async(queue,
+        ^{
+            if ([self.delegate respondsToSelector:@selector(socket:didEncounterError:)])
+            {
+                [self.delegate socket:self didEncounterError:_error];
+            }
+        });
 }
 
 - (void)didReceiveData:(NSData *)aData fromAddress:(NSString *)anAddress
